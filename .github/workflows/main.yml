@@ -6,14 +6,14 @@ on:
       PG_VERSION:
         description: 'Postgres version'
         required: true
-        default: '15.3'
+        default: '17.2'
       EXTENSIONS:
         description: 'Postgres extensions to install'
         required: true
-        default: 'cron timescaledb'
+        default: 'cron pgvector vchord'
       TIMESCALEDB_VERSION:
         description: 'TimescaleDB version'
-        required: true
+        required: false
         default: '2.11.0'
 jobs:
   build:
