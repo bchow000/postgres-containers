@@ -37,7 +37,7 @@ for EXTENSION in ${EXTENSIONS}; do
     fi
 
     if [ $(pgxn search ${EXTENSION} | wc -l) -gt 0 ]; then
-        pgxn install --ext --yes ${EXTENSION}
+        pgxn install --yes ${EXTENSION}
         continue
     fi
     # is it an extension found in apt?
