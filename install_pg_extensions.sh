@@ -4,7 +4,7 @@ set -euxo pipefail
 # calling syntax: install_pg_extensions.sh [extension1] [extension2] ...
 
 # Install postgresql contrib
-apt-get install -y pgxnclient
+apt-get install -y pgxnclient gmake
 # install extensions
 EXTENSIONS="$@"
 # cycle through extensions list
