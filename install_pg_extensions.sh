@@ -4,7 +4,7 @@ set -euxo pipefail
 # calling syntax: install_pg_extensions.sh [extension1] [extension2] ...
 
 # Install postgresql contrib
-apt-get install -y postgresql-contrib
+apt-get install -y pgxnclient
 # install extensions
 EXTENSIONS="$@"
 # cycle through extensions list
@@ -36,12 +36,16 @@ for EXTENSION in ${EXTENSIONS}; do
         continue
     fi
 
-    # is it an extension found in apt?
-    if apt-cache show "postgresql-${PG_MAJOR}-${EXTENSION}" &> /dev/null; then
-        # install the extension
-        apt-get install -y "postgresql-${PG_MAJOR}-${EXTENSION}"
+    if [ $(pgxn search ${EXTENSION} | wc -l) -gt 0 ]; then
+        pgxn install --ext --yes ${EXTENSION}
         continue
     fi
+    # is it an extension found in apt?
+    # if apt-cache show "postgresql-${PG_MAJOR}-${EXTENSION}" &> /dev/null; then
+        # install the extension
+        # apt-get install -y "postgresql-${PG_MAJOR}-${EXTENSION}"
+    #    continue
+    #fi
 
     # extension not found/supported
     echo "Extension '${EXTENSION}' not found/supported"
