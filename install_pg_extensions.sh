@@ -3,8 +3,6 @@ set -euxo pipefail
 
 # calling syntax: install_pg_extensions.sh [extension1] [extension2] ...
 
-# Install postgresql contrib
-apt-get install -y pgxnclient r-cran-pkgmaker
 # install extensions
 EXTENSIONS="$@"
 # cycle through extensions list
