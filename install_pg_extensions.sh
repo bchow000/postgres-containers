@@ -38,10 +38,13 @@ for EXTENSION in ${EXTENSIONS}; do
         # Install JQ
         apt install -y jq
         # Get the actual latest release tag (follow redirect)
-        latest_tag=$(curl -sL -o /dev/null -w '%{url_effective}' https://github.com/tensorchord/VectorChord/releases/latest | awk -F/ '{print $NF}')
+        latest_tag=$(wget --server-response --max-redirect=0 https://github.com/tensorchord/VectorChord/releases/latest 2>&1 | \
+          awk '/^ Location: / {print $2}' | awk -F/ '{print $NF}' | tr -d '\r')
+
 
         # List all assets for that release
-        assets_json=$(curl -s https://api.github.com/repos/tensorchord/VectorChord/releases/tags/$latest_tag)
+        assets_json=$(wget -qO- "https://api.github.com/repos/tensorchord/VectorChord/releases/tags/$latest_tag")
+
 
         # Extract the .deb URL for PostgreSQL 17 and x86_64
         # deb_url=$(echo "$assets_json" | jq -r '.assets[] | select(.name | test("vchord-pg${PG_MAJOR}_.*_amd64.deb")) | .browser_download_url')
