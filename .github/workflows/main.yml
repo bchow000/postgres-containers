@@ -38,7 +38,7 @@ jobs:
         
         # Add the vchord version
         export VCHORD_VER=$(curl -sL -o /dev/null -w '%{url_effective}' https://github.com/tensorchord/VectorChord/releases/latest | awk -F/ '{print $NF}')
-        export EXTENSIONS=$(echo "${EXTENSIONS}" | sed 's/vchord/'"vchord_${VCHORD_VER}"'/g')
+        export EXTENSIONS=$(echo "${EXTENSIONS}" | sed "s/vchord/vchord_${VCHORD_VER}/g")
 
         # step 2: if exists, replace extension timescaledb with its versioned equivalent; replace spaces with dashes
         export EXTENSIONS=$(echo "${{ github.event.inputs.EXTENSIONS }}" | sed 's/timescaledb/timescaledb-${{ github.event.inputs.TIMESCALEDB_VERSION }}/g;s/ /-/g')
