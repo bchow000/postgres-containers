@@ -1,5 +1,10 @@
 name: build container
 on:
+  # triggerd by push to main with default values
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
   # triggered by user action only
   workflow_dispatch:
     inputs:
