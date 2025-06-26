@@ -6,7 +6,7 @@ on:
       PG_VERSION:
         description: "Postgres version"
         required: true
-        default: "17.2"
+        default: "17.5"
       EXTENSIONS:
         description: "Postgres extensions to install"
         required: true
