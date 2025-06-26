@@ -11,12 +11,15 @@ on:
       PG_VERSION:
         description: "Postgres version"
         required: false
+        default: "17.5"
       EXTENSIONS:
         description: "Postgres extensions to install"
         required: false
+        default: "vchord"
       TIMESCALEDB_VERSION:
         description: "TimescaleDB version"
         required: false
+        default: "2.20.3"
 
 env:
   DEFAULT_PG_VERSION: "17.5"
