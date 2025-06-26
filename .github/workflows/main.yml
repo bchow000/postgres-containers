@@ -1,53 +1,74 @@
+---
 name: build container
+
 on:
-  # triggerd by push to main with default values
   push:
     branches: ["main"]
   pull_request:
     branches: ["main"]
-  # triggered by user action only
   workflow_dispatch:
     inputs:
       PG_VERSION:
         description: "Postgres version"
-        required: true
-        default: "17.5"
+        required: false
       EXTENSIONS:
         description: "Postgres extensions to install"
-        required: true
-        default: "vchord"
+        required: false
       TIMESCALEDB_VERSION:
         description: "TimescaleDB version"
-        required: true
-        default: "2.20.3"
+        required: false
+
+env:
+  DEFAULT_PG_VERSION: "17.5"
+  DEFAULT_EXTENSIONS: "vchord"
+  DEFAULT_TIMESCALEDB_VERSION: "2.20.3"
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - uses: docker/setup-buildx-action@v2
+
       - uses: docker/login-action@v2
-        # authenticate ghcr.io
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: set vchord version
         id: vchord-ver
-        run: echo "VCHORD_VER=$(curl -sL -o /dev/null -w '%{url_effective}' https://github.com/tensorchord/VectorChord/releases/latest | awk -F/ '{print $NF}')" >> $GITHUB_OUTPUT
+        run: |
+          echo "VCHORD_VER=$(curl -sL -o /dev/null -w '%{url_effective}' https://github.com/tensorchord/VectorChord/releases/latest | awk -F/ '{print $NF}')" >> $GITHUB_OUTPUT
+
       - name: calculate image tag
         id: vars
         run: |
-          # step 1: order extensions alphabetically
-          export EXTENSIONS=$(echo "${{ github.event.inputs.EXTENSIONS }}" | tr ' ' '\n' | sort | tr '\n' ' ')
-          # this is good but it leaves a trailing space. Fix it:
-          export EXTENSIONS=$(echo "${EXTENSIONS}" | sed 's/ $//g')
-          # step 2: if exists, replace extension timescaledb with its versioned equivalent; replace spaces with dashes
-          export EXTENSIONS=$(echo "${{ github.event.inputs.EXTENSIONS }}" | sed 's/timescaledb/timescaledb-${{ github.event.inputs.TIMESCALEDB_VERSION }}/g;s/ /-/g')
-          # Add the vchord version
-          export EXTENSIONS=$(echo "${EXTENSIONS}" | sed 's/vchord/vchord-${{ steps.vchord-ver.outputs.VCHORD_VER }}/g')
-          # step 3: output variable to github action
-          echo "IMAGE_TAG=pg${{ github.event.inputs.PG_VERSION }}-${EXTENSIONS}" >> $GITHUB_OUTPUT
+          # Determine trigger type and set values accordingly
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            PG_VERSION="${{ github.event.inputs.PG_VERSION || env.DEFAULT_PG_VERSION }}"
+            EXTENSIONS_RAW="${{ github.event.inputs.EXTENSIONS || env.DEFAULT_EXTENSIONS }}"
+            TIMESCALEDB_VERSION="${{ github.event.inputs.TIMESCALEDB_VERSION || env.DEFAULT_TIMESCALEDB_VERSION }}"
+          else
+            PG_VERSION="${{ env.DEFAULT_PG_VERSION }}"
+            EXTENSIONS_RAW="${{ env.DEFAULT_EXTENSIONS }}"
+            TIMESCALEDB_VERSION="${{ env.DEFAULT_TIMESCALEDB_VERSION }}"
+          fi
+
+          # Order extensions alphabetically and clean trailing space
+          EXTENSIONS=$(echo "$EXTENSIONS_RAW" | tr ' ' '\n' | sort | tr '\n' ' ')
+          EXTENSIONS=$(echo "$EXTENSIONS" | sed 's/ $//g')
+
+          # Replace extensions with versioned variants
+          EXTENSIONS=$(echo "$EXTENSIONS" | sed "s/timescaledb/timescaledb-${TIMESCALEDB_VERSION}/g" | sed "s/ /-/g")
+          EXTENSIONS=$(echo "$EXTENSIONS" | sed "s/vchord/vchord-${{ steps.vchord-ver.outputs.VCHORD_VER }}/g")
+
+          echo "IMAGE_TAG=pg${PG_VERSION}-${EXTENSIONS}" >> $GITHUB_OUTPUT
+          echo "PG_VERSION=$PG_VERSION" >> $GITHUB_ENV
+          echo "EXTENSIONS_RAW=$EXTENSIONS_RAW" >> $GITHUB_ENV
+          echo "TIMESCALEDB_VERSION=$TIMESCALEDB_VERSION" >> $GITHUB_ENV
+
       - uses: docker/build-push-action@v3
         with:
           context: .
@@ -55,6 +76,6 @@ jobs:
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/postgresql:${{ steps.vars.outputs.IMAGE_TAG }}
           build-args: |
-            POSTGRESQL_VERSION=${{ github.event.inputs.PG_VERSION }}
-            EXTENSIONS=${{ github.event.inputs.EXTENSIONS }}
-            TIMESCALEDB_VERSION=${{ github.event.inputs.TIMESCALEDB_VERSION }}
+            POSTGRESQL_VERSION=${{ env.PG_VERSION }}
+            EXTENSIONS=${{ env.EXTENSIONS_RAW }}
+            TIMESCALEDB_VERSION=${{ env.TIMESCALEDB_VERSION }}
