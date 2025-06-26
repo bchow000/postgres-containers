@@ -25,7 +25,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: set vchord version
       id: vchord-ver
-      run: echo "VCHORD_VER=$(curl -sL -o /dev/null -w '%{url_effective}' https://github.com/tensorchord/VectorChord/releases/latest | awk -F/ '{print $NF}')" >> "$GITHUB_OUTPUT"          
+      run: echo "VCHORD_VER=$(curl -sL -o /dev/null -w '%{url_effective}' https://github.com/tensorchord/VectorChord/releases/latest | awk -F/ '{print $NF}')" >> $GITHUB_OUTPUT        
     - name: calculate image tag
       id: vars
       run: |
