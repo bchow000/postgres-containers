@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euxo pipefail
-
+PG_MAJOR=17.6
 # calling syntax: install_pg_extensions.sh [extension1] [extension2] ...
 
 function install_vchord() {
