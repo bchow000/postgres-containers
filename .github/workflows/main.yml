@@ -67,7 +67,7 @@ jobs:
           EXTENSIONS=$(echo "$EXTENSIONS" | sed "s/timescaledb/timescaledb-${TIMESCALEDB_VERSION}/g" | sed "s/ /-/g")
           EXTENSIONS=$(echo "$EXTENSIONS" | sed "s/vchord/vchord${{ steps.vchord-ver.outputs.VCHORD_VER }}/g")
 
-          echo "IMAGE_TAG=pg${PG_VERSION}-${EXTENSIONS}" >> $GITHUB_OUTPUT
+          echo "IMAGE_TAG=postgres_${EXTENSIONS}.${PG_VERSION}" >> $GITHUB_OUTPUT
           echo "PG_VERSION=$PG_VERSION" >> $GITHUB_ENV
           echo "EXTENSIONS_RAW=$EXTENSIONS_RAW" >> $GITHUB_ENV
           echo "TIMESCALEDB_VERSION=$TIMESCALEDB_VERSION" >> $GITHUB_ENV
