@@ -11,7 +11,7 @@ on:
       PG_VERSION:
         description: "Postgres version"
         required: false
-        default: "17.5"
+        default: "17.6-standard-trixie"
       EXTENSIONS:
         description: "Postgres extensions to install"
         required: false
@@ -22,7 +22,7 @@ on:
         default: "2.20.4"
 
 env:
-  DEFAULT_PG_VERSION: "17.5"
+  DEFAULT_PG_VERSION: "17.6-standard-trixie"
   DEFAULT_EXTENSIONS: "vchord"
   DEFAULT_TIMESCALEDB_VERSION: "2.20.3"
 
