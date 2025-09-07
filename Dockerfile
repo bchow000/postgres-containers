@@ -1,5 +1,5 @@
 # add extensions to cnpg postgresql image: timescaledb, pg_cron
-ARG POSTGRESQL_VERSION=17.5
+ARG POSTGRESQL_VERSION=17.6-standard-trixie
 # ARG EXTENSIONS="timescaledb cron"
 ARG EXTENSIONS="vchord"
 ARG TIMESCALEDB_VERSION=2.11.0
