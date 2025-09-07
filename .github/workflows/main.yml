@@ -58,6 +58,7 @@ jobs:
             EXTENSIONS_RAW="${{ env.DEFAULT_EXTENSIONS }}"
             TIMESCALEDB_VERSION="${{ env.DEFAULT_TIMESCALEDB_VERSION }}"
           fi
+          PG_MAJOR="${{ env.PG_MAJOR }}"
 
           # Order extensions alphabetically and clean trailing space
           EXTENSIONS=$(echo "$EXTENSIONS_RAW" | tr ' ' '\n' | sort | tr '\n' ' ')
